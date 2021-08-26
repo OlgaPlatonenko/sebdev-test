@@ -8,9 +8,8 @@ export const searchVideos = createAsyncThunk(
   async (params: ISearchVideoInput) => {
     try {
       const response = await getVideos(params);
-
       return response;
-    } catch(err) {
+    } catch (err) {
       return err;
     }
   },
@@ -27,11 +26,23 @@ interface IVideoItem {
   }
 }
 
+interface IVideoFavouriteItem {
+  userId: string,
+  favourite: {
+    queryText?: string;
+    queryName?: string;
+    sortBy?: string;
+    slider?: number;
+  }
+}
+
 interface IYoutubeSearchState {
   videos: IVideoItem[];
   totalCount: number;
   isLoading: boolean;
   query: string;
+  favourite: IVideoFavouriteItem[];
+  allQueries: IVideoFavouriteItem[];
 }
 
 const initialState = {
@@ -39,6 +50,8 @@ const initialState = {
   totalCount: 0,
   isLoading: false,
   query: '',
+  favourite: [],
+  allQueries: [],
 } as IYoutubeSearchState;
 
 const youtubeSearchSlice = createSlice({
@@ -48,7 +61,16 @@ const youtubeSearchSlice = createSlice({
     setQuery(state, action: PayloadAction<{ query: string }>) {
       state.query = action.payload.query;
     },
+    saveQuery(state, action) {
+      const payload = action.payload as IVideoFavouriteItem;
+      state.favourite.push(payload);
+      state.allQueries.push(payload);
+    },
+    addQueriesReload(state, action) {
+      state.allQueries=action.payload;
+    },
   },
+
   extraReducers: (builder) => {
     builder.addCase(searchVideos.pending, (state) => {
       state.isLoading = true;
@@ -75,5 +97,5 @@ const youtubeSearchSlice = createSlice({
   },
 });
 
-export const { setQuery } = youtubeSearchSlice.actions;
+export const { setQuery, saveQuery, addQueriesReload } = youtubeSearchSlice.actions;
 export default youtubeSearchSlice.reducer;

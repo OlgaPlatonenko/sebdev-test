@@ -1,0 +1,32 @@
+.listname{
+    display: flex;    
+    justify-content: space-between;
+    margin-top: 50px;   
+    margin-bottom: 30px;  
+}
+
+.listicons{
+    margin-left: 10px;    
+}
+.listicons:hover{
+    cursor: pointer;  
+}
+.listnameleft{
+    display: flex;
+}
+
+.listnametext{
+  margin-right: 10px;
+  font-weight: 400;
+  font-size: 16px;
+}
+.listnamequery{
+   margin-right: 15px;
+   font-weight: 500;
+   font-size: 16px;
+}
+.listnametotalcount{
+    font-size: 16px;
+    line-height: 20px;
+    color: rgba(23, 23, 25, 0.3);
+}
