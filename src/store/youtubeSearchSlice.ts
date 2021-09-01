@@ -8,32 +8,23 @@ export const searchVideos = createAsyncThunk(
   async (params: ISearchVideoInput) => {
     try {
       const response = await getVideos(params);
+
       return response;
-    } catch (err) {
+    } catch(err) {
       return err;
     }
   },
 );
 
-interface IVideoItem {
+export interface IVideoItem {
   videoId: string;
   title: string;
   description: string;
-  thumbnail: {
+  thumbnail?: {
     width: number;
     height: number;
     url: string;
-  }
-}
-
-interface IVideoFavouriteItem {
-  userId: string,
-  favourite: {
-    queryText?: string;
-    queryName?: string;
-    sortBy?: string;
-    slider?: number;
-  }
+  } ;
 }
 
 interface IYoutubeSearchState {
@@ -41,8 +32,8 @@ interface IYoutubeSearchState {
   totalCount: number;
   isLoading: boolean;
   query: string;
-  favourite: IVideoFavouriteItem[];
-  allQueries: IVideoFavouriteItem[];
+  status: string;
+  isGrid: boolean;
 }
 
 const initialState = {
@@ -50,30 +41,28 @@ const initialState = {
   totalCount: 0,
   isLoading: false,
   query: '',
-  favourite: [],
-  allQueries: [],
+  status: '',
+  isGrid: true,
 } as IYoutubeSearchState;
 
 const youtubeSearchSlice = createSlice({
   name: 'youtubeSearch',
   initialState,
   reducers: {
-    setQuery(state, action: PayloadAction<{ query: string }>) {
+    setSearchQuery(state, action: PayloadAction<{ query: string }>) {
       state.query = action.payload.query;
     },
-    saveQuery(state, action) {
-      const payload = action.payload as IVideoFavouriteItem;
-      state.favourite.push(payload);
-      state.allQueries.push(payload);
+    setIsGrid(state) {
+      state.isGrid = true;
     },
-    addQueriesReload(state, action) {
-      state.allQueries=action.payload;
+    setIsNotGrid(state) {
+      state.isGrid = false;
     },
   },
-
   extraReducers: (builder) => {
     builder.addCase(searchVideos.pending, (state) => {
       state.isLoading = true;
+      state.status = 'pending';
     });
     builder.addCase(searchVideos.fulfilled, (state, action) => {
       const payload = action.payload as ISearchVideoResponse;
@@ -89,13 +78,15 @@ const youtubeSearchSlice = createSlice({
           url: v.snippet.thumbnails.medium.url,
         },
       }));
+      state.status = 'fulfilled';
       state.isLoading = false;
     });
     builder.addCase(searchVideos.rejected, (state) => {
+      state.status = 'rejected';
       state.isLoading = false;
     });
   },
 });
 
-export const { setQuery, saveQuery, addQueriesReload } = youtubeSearchSlice.actions;
+export const { setSearchQuery, setIsGrid, setIsNotGrid } = youtubeSearchSlice.actions;
 export default youtubeSearchSlice.reducer;

@@ -40,3 +40,11 @@ export interface ISearchVideoResponse {
   }
   items: ISearchVideoResponseItem[]
 }
+
+export interface IFavoritesInput {
+  id: string;
+  query: string;
+  title: string;
+  order: TOrder | null;
+  resultsPerPage: number;
+}

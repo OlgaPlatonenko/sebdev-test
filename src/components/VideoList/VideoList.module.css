@@ -1,0 +1,46 @@
+.listwrapper{
+    max-width: 1140px;
+    margin: 10px;
+    position: relative;
+    max-width: 1140px;
+    padding-left: 200px;
+    padding-right: 200px;
+}
+
+.videoconainer{
+    display: flex;
+}
+
+.listvideos{
+  list-style: none;
+  
+}
+
+.videoitem{
+    display: block;
+    margin-bottom: 30px;
+   
+}
+.aboutvideo{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 5px 0 5px 0;
+}
+
+.videotitle{
+    font-family: 'Roboto';
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 20px;
+}
+.videodescripton{
+    font-family: 'Roboto';
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 20px;
+    color: rgba(23, 23, 25, 0.3);
+}
+
+
+

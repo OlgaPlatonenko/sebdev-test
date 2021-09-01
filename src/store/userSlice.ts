@@ -17,8 +17,11 @@ const userSlice = createSlice({
     setIsLoggedIn(state, action: PayloadAction<boolean>) {
       state.isLoggedIn = action.payload;
     },
+    setUsername(state, action: PayloadAction<string>) {
+      state.username = action.payload;
+    },
   },
 });
 
-export const { setIsLoggedIn } = userSlice.actions;
+export const { setIsLoggedIn, setUsername } = userSlice.actions;
 export default userSlice.reducer;

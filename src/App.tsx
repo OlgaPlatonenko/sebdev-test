@@ -19,9 +19,9 @@ const App: FC<AppProps> = () => {
         </Layout.Header>
       )}
 
-      <Layout.Content>
+      <Layout.Content style={{ minHeight: '100vh' }}>
         <Row justify="center">
-          <Col span={23}>
+          <Col span={16}>
             <RouterView />
           </Col>
         </Row>

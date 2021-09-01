@@ -6,7 +6,7 @@ import { useDispatch } from 'react-redux';
 import { LoginForm } from '../../components';
 import { login } from '../../api/login';
 import { IUserLoginInput } from '../../api/types';
-import { setIsLoggedIn } from '../../store/userSlice';
+import { setIsLoggedIn, setUsername } from '../../store/userSlice';
 
 interface LoginScreenProps {}
 
@@ -26,6 +26,7 @@ const LoginScreen: FC<LoginScreenProps> = () => {
 
     localStorage.setItem('authToken', user.token);
     reduxDispatch(setIsLoggedIn(true));
+    reduxDispatch(setUsername(user.username));
     routeHistory.push('/');
   };
 

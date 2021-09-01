@@ -1,13 +1,18 @@
 import { FC } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import React, { useState } from 'react';
-import { Modal } from 'antd';
-import { Form, Input, Select, Slider } from 'antd';
+import { Modal, Input } from 'antd';
 import { HeartOutlined } from '@ant-design/icons';
+import { v4 as uuidV4 } from 'uuid';
 
-import { searchVideos, setQuery, saveQuery, addQueriesReload } from '../../store/youtubeSearchSlice';
+import { searchVideos, setSearchQuery } from '../../store/youtubeSearchSlice';
+import { setFavorites } from '../../store/favoritesSlice';
 import { RootState } from '../../store';
 import VideoListTitle from '../../components/VideoListTitle/VideoListTitle';
+import VideoList from '../../components/VideoList/VideoList';
+import VideoListTable from '../../components/VideoList/VideoListTable';
+import FavoriteForm from '../../components/FavoritesForm/FavoritesForm';
+import { IFavoritesInput } from '../../api/types';
 const { Search } = Input;
 
 interface SearchScreenProps { }
@@ -15,28 +20,18 @@ interface SearchScreenProps { }
 const SearchScreen: FC<SearchScreenProps> = () => {
   const reduxDispatch = useDispatch();
   const search = useSelector((state: RootState) => state.youtubeSeach);
+  const [isModalOpen, setModalOpen] = useState(false);
+  const [query, setQuery] = useState('');
+  const { username } = useSelector((state: RootState) => state.user);
+  const status = search.status;
 
   const makeSearch = (q: string) => {
     if (!q) {
       return;
     }
 
-    reduxDispatch(setQuery({ query: q }));
+    reduxDispatch(setSearchQuery({ query: q }));
     reduxDispatch(searchVideos({ q }));
-  };
-
-  const [isModalVisible, setIsModalVisible] = useState(false);
-
-  const openModal = () => {
-    setIsModalVisible(true);
-  };
-
-  const handleOk = () => {
-    setIsModalVisible(false);
-  };
-
-  const handleCancel = () => {
-    setIsModalVisible(false);
   };
 
   const suffix = (
@@ -46,61 +41,13 @@ const SearchScreen: FC<SearchScreenProps> = () => {
         color: '#1890ff',
         cursor: 'pointer',
       }}
-      onClick={openModal}
+      onClick={() => setModalOpen(true)}
     />
   );
 
-  const formItemLayout = {
-    labelCol: { span: 10 },
-    wrapperCol: { span: 20 },
+  const saveToFavorites = (values: IFavoritesInput) => {
+    reduxDispatch(setFavorites({ ...values, username, id: uuidV4() }));
   };
-
-  const { Option } = Select;
-
-  const onFinish = (values: any) => {
-    values.userId = localStorage.getItem('authToken');
-    values.queryText = search.query;
-    reduxDispatch(saveQuery(values));
-  };
-  //Т.о. обошла момент, когла localStorage пустой и будет ошибка push
-  //т.е. просто подставляю пусто массив
-  //код из моего проекта не работает
-  //СПРОСИТЬ
-  /**
-   //чтобы после обновления страницы и обновления state не перезаписывался localstorage
-    //делаем проверку. если было обновление и state пустой читаем его из localstorage,
-    //и обновляем не пустым значением из slice а считанным из localstorage значением
-    //то есть сохраняем предыдущие сохраненные запросы
-    //иначе просто пишем в localstorage массив запросов
-
-    if (localStorage.getItem('savedquery') === null) {
-        reduxDispatch(addQueriesReload([].concat({
-            nameOfQuery: '',
-            textOfQuery: '',
-            sortByOfQuery: null,
-        })));
-    }
-    let allQueries = useSelector((state) => state.videostore.allQueries);
-    if (allQueries.length === 0) {
-        reduxDispatch(addQueriesReload(JSON.parse(localStorage.getItem('savedquery'))));
-    } else {
-        localStorage.setItem('savedquery', JSON.stringify(allQueries))
-    };
-   **/
-  let emptyArr: any = [{
-    queryText: '',
-    queryName: '',
-    sortBy: '',
-    slider: 12,
-  }];
-  if (localStorage.getItem('favquery') === null) {
-    localStorage.setItem('favquery', JSON.stringify(emptyArr));
-  }
-  if (search.allQueries.length === 0) {
-    reduxDispatch(addQueriesReload(JSON.parse(localStorage.getItem('favquery') || '{}')));
-  } else {
-    localStorage.setItem('favquery', JSON.stringify(search.allQueries));
-  }
 
   return (
     <div>
@@ -111,63 +58,44 @@ const SearchScreen: FC<SearchScreenProps> = () => {
         loading={search.isLoading}
         onSearch={makeSearch}
         suffix={suffix}
+        onChange={(e) => setQuery(e.target.value)}
+        value={query}
       />
-      <VideoListTitle/>
+      {(status === 'fulfilled' && search.isGrid) ? (
+        <div>
+          <VideoListTitle />
+          <VideoList
+            videos={search.videos}
+            resultsPerPage={12}
+          />
+        </div>) : (
+        (status === 'fulfilled' && !search.isGrid) ? (
+          <div>
+            <VideoListTitle />
+            <VideoListTable
+              videos={search.videos}
+              resultsPerPage={12}
+            />
+          </div>) : null
+      )}
+
       <Modal
         title="Сохранить запрос"
-        visible={isModalVisible}
-        onOk={handleOk}
-        onCancel={handleCancel}
-        okButtonProps={{ form: 'saveForm', htmlType: 'submit' }}
+        visible={isModalOpen}
+        footer={null}
+        onCancel={() => setModalOpen(false)}
       >
-        <Form
-          name="saveForm"
-          id="saveForm"
-          {...formItemLayout}
-          onFinish={onFinish}
+        <FavoriteForm
           initialValues={{
-            'input-number': 3,
-            'checkbox-group': ['A', 'B'],
-            rate: 3.5,
+            id: '',
+            title: '',
+            query,
+            order: null,
+            resultsPerPage: 12,
           }}
-        >
-          <Form.Item
-            name="queryText"
-            label="Запрос"
-          >
-            <Input
-              defaultValue={search.query}
-              form='saveForm' />
-          </Form.Item>
-          <Form.Item
-            name="queryName"
-            label="Название">
-            <Input placeholder="Укажите название" />
-          </Form.Item>
-          <Form.Item
-            name="sortBy"
-            label="Select"
-            hasFeedback
-            rules={[{ required: true, message: 'Сортировать по...' }]}
-          >
-            <Select placeholder="Без сортировки">
-              <Option value="date">date</Option>
-              <Option value="rating">rating</Option>
-              <Option value="relevance">relevance</Option>
-              <Option value="title">title</Option>
-              <Option value="videoCount">videoCount</Option>
-              <Option value="viewCount">viewCount</Option>
-            </Select>
-          </Form.Item>
-          <Form.Item label="Максимальное количество:">
-            <span className="ant-form-text" ></span>
-          </Form.Item>
-          <Form.Item name="slider" >
-            <Slider
-              max={50}
-            />
-          </Form.Item>
-        </Form>
+          onCancel={() => setModalOpen(false)}
+          onSubmit={(values) => saveToFavorites(values)}
+        />
       </Modal>
 
     </div>

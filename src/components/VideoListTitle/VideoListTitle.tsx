@@ -2,24 +2,15 @@ import { FC } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { UnorderedListOutlined, AppstoreOutlined } from '@ant-design/icons';
 import { RootState } from '../../store';
-import { searchVideos } from '../../store/youtubeSearchSlice';
+import { setIsGrid, setIsNotGrid } from '../../store/youtubeSearchSlice';
 
 import styles from './VideoListTitle.module.css';
 
 interface IVideoListTitle { }
 
-//const reduxDispatch = useDispatch();
-
-const handleIsShowList = () => {
-  //reduxDispatch(isShowListTrue());
-  // reduxDispatch(isShowTableFalse());
-};
-const handleIsShowTable = () => {
-  // reduxDispatch(isShowListFalse());
-  //reduxDispatch(isShowTableTrue());
-};
-
 const VideoListTitle: FC<IVideoListTitle> = () => {
+
+  const reduxDispatch = useDispatch();
 
   const search = useSelector((state: RootState) => state.youtubeSeach);
   let query = search.query;
@@ -35,8 +26,8 @@ const VideoListTitle: FC<IVideoListTitle> = () => {
         </div>
         <div className={styles.listnameright}>
           <div className={styles.listicons}>
-            <div onClick={handleIsShowList}> <UnorderedListOutlined /> </div>
-            <div onClick={handleIsShowTable}><AppstoreOutlined /></div>
+            <div onClick={() => {  reduxDispatch(setIsGrid()); }}> <UnorderedListOutlined /> </div>
+            <div onClick={() => {  reduxDispatch(setIsNotGrid()); }}><AppstoreOutlined /></div>
           </div>
         </div>
       </div>
