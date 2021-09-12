@@ -1,3 +1,4 @@
+import * as React from 'react';
 import { FC, useMemo, useEffect } from 'react';
 import { Form, Input, Button, Select, Slider } from 'antd';
 
@@ -9,6 +10,8 @@ interface FavoritesFormProps {
   initialValues: IFavoritesInput,
   onCancel: () => void;
   onSubmit: (values: IFavoritesInput) => void;
+  changeFavoriteTitle?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  changeFavoriteResultsPerPage?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   editMode?: boolean;
 }
 
@@ -16,6 +19,8 @@ const FavoritesForm: FC<FavoritesFormProps> = ({
   initialValues,
   onCancel,
   onSubmit,
+  changeFavoriteTitle,
+  changeFavoriteResultsPerPage,
   editMode = false,
 }) => {
   const [form] = Form.useForm();
@@ -45,7 +50,9 @@ const FavoritesForm: FC<FavoritesFormProps> = ({
         name="title"
         label="Название"
       >
-        <Input placeholder="Укажите название" />
+        <Input
+          placeholder="Укажите название"
+          onChange={changeFavoriteTitle} />
       </Form.Item>
 
       <Form.Item

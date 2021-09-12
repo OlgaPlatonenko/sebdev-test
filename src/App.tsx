@@ -6,7 +6,7 @@ import { RouterView } from './router';
 import { Header } from './components';
 import { RootState } from './store';
 
-interface AppProps {}
+interface AppProps { }
 
 const App: FC<AppProps> = () => {
   const { isLoggedIn } = useSelector((state: RootState) => state.user);
@@ -14,18 +14,19 @@ const App: FC<AppProps> = () => {
   return (
     <Layout style={{ height: '100vh' }}>
       {isLoggedIn && (
-        <Layout.Header style={{ background: '#FFF' }}>
+        <Layout.Header style={{ background: '#FFF' , height: '75px' }}>
           <Header />
         </Layout.Header>
       )}
-
-      <Layout.Content style={{ minHeight: '100vh' }}>
-        <Row justify="center">
-          <Col span={16}>
-            <RouterView />
-          </Col>
-        </Row>
-      </Layout.Content>
+      <Layout>
+        <Layout.Content style={{ minHeight: '100vh', padding: '20px' }}>
+          <Row justify="center">
+            <Col span={16}>
+              <RouterView />
+            </Col>
+          </Row>
+        </Layout.Content>
+      </Layout>
     </Layout>
   );
 };

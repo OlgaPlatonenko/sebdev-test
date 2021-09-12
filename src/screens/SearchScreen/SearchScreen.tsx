@@ -47,6 +47,7 @@ const SearchScreen: FC<SearchScreenProps> = () => {
 
   const saveToFavorites = (values: IFavoritesInput) => {
     reduxDispatch(setFavorites({ ...values, username, id: uuidV4() }));
+    setModalOpen(false);
   };
 
   return (
