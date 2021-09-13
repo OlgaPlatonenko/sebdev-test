@@ -12,6 +12,9 @@ export function login(data: IUserLoginInput): ILoginResponse | null {
       token: uuidV4(),
     };
   }
-
   return null;
+}
+
+export function getUser() {
+  return users[0];
 }

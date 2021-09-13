@@ -30,7 +30,7 @@ const FavoritesScreen: FC<FavoritesScreenProps> = () => {
   const favoritesArr = JSON.parse(localStorage.getItem('user1') || '{}');
   const [isModalOpen, setModalOpen] = useState(false);
   const [isConfirmOpen, setConfirmOpen] = useState(false);
-  const favoritesState = useSelector((state: RootState) => state.favorites); 
+  const favoritesState = useSelector((state: RootState) => state.favorites);
   const reduxDispatch = useDispatch();
 
   const setEditValue = (id: any) => {

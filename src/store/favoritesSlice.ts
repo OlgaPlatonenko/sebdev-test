@@ -95,6 +95,7 @@ const favoritesSlice = createSlice({
           k=idx;
           return k;
         }
+        return k;
       });
       state.favoriteList.splice(k,1);
       localStorage.user1 = JSON.stringify(state.favoriteList);
