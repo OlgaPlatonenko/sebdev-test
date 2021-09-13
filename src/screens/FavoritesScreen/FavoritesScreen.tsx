@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { FC, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 import { RootState } from '../../store';
 import { List, Button, Modal, Popconfirm, Row, Col } from 'antd';
 import { IFavoritesInput } from '../../api/types';
@@ -20,6 +21,8 @@ import {
   addFavoriteResultsPerPage,
   deleteQuery,
 } from '../../store/favoritesSlice';
+
+import { setSearchQuery, searchVideos } from '../../store/youtubeSearchSlice';
 import { v4 as uuidV4 } from 'uuid';
 interface FavoritesScreenProps {
   favorites: IFavoritesInput[];
@@ -32,6 +35,7 @@ const FavoritesScreen: FC<FavoritesScreenProps> = () => {
   const [isConfirmOpen, setConfirmOpen] = useState(false);
   const favoritesState = useSelector((state: RootState) => state.favorites);
   const reduxDispatch = useDispatch();
+  const routeHistory = useHistory();
 
   const setEditValue = (id: any) => {
     reduxDispatch(setEditFavorites(id));
@@ -62,6 +66,17 @@ const FavoritesScreen: FC<FavoritesScreenProps> = () => {
     reduxDispatch(deleteQuery());
     setConfirmOpen(false);
   };
+  const search = (id: string) => {
+    console.log('search');
+    const searchInput = favoritesState.favoriteList.filter(el => el.id === id)[0];
+    reduxDispatch(setSearchQuery({ query: searchInput.query }));
+    reduxDispatch(searchVideos({
+      q: searchInput.query,
+      order: searchInput.order ? searchInput.order : 'relevance',
+      resultsPerPage: searchInput.resultsPerPage,
+    }));
+    routeHistory.push('/');
+  };
 
   return (
     <div>
@@ -73,7 +88,9 @@ const FavoritesScreen: FC<FavoritesScreenProps> = () => {
           <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}>
             <List.Item>
               <Col className="gutter-row" >
-                {item.title}
+                <div onClick={() => search(item.id)} style={{ cursor: 'pointer' }}>
+                  {item.title}
+                </div>
               </Col>
               <Col
                 className="gutter-row"
